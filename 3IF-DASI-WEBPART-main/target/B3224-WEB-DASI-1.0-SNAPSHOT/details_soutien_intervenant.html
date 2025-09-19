@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Détails du soutien - Instruct'IF</title>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <style>
+    body {
+      background-color: #e3f7cc;
+      font-family: monospace;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+    .container {
+      background-color: #dcdcdc;
+      padding: 2rem;
+      border-radius: 25px;
+      width: 700px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.15);
+    }
+    .header button {
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      padding: 0.5rem 1rem;
+      border-radius: 15px;
+      font-weight: bold;
+      cursor: pointer;
+      margin-bottom: 1rem;
+    }
+    .info-block {
+      background-color: #b3a6a6;
+      padding: 1.5rem;
+      border-radius: 12px;
+    }
+    .info-block p {
+      margin: 0.5rem 0;
+    }
+    textarea {
+      width: 100%;
+      height: 60px;
+      margin-top: 0.5rem;
+      resize: none;
+      font-family: monospace;
+    }
+    a {
+      color: blue;
+    }
+    .btn-modifier {
+      margin-top: 1rem;
+      display: flex;
+      justify-content: center;
+    }
+    .btn-modifier button {
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      padding: 0.6rem 1.5rem;
+      border-radius: 8px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <button onclick="window.location.href='profil_intervenant_intervenant.html'">Profil</button>
+    </div>
+
+    <div class="info-block">
+      <p><strong>Matière:</strong> <span id="matiere"></span></p>
+      <p><strong>Intervenant:</strong> <span id="intervenant"></span></p>
+      <p><strong>Élève:</strong> <span id="eleve"></span></p>
+      <p><strong>Date:</strong> <span id="date"></span></p>
+
+      <p><strong>Description demande:</strong></p>
+      <textarea id="description" readonly></textarea>
+
+      <p><strong>lien de la visio-conférence:</strong> <a id="visio" href="#" target="_blank">Lien</a></p>
+
+      <p><strong>Niveau de compréhension de l'élève:</strong> <span id="niveau"></span></p>
+      <p><strong>Bilan de l’intervenant:</strong></p>
+      <textarea id="bilan" readonly></textarea>
+
+      <div class="btn-modifier">
+        <button>Ecrire votre bilan</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Exemple d’appel avec un id dans l’URL : detailSoutien.html?id=5
+    const urlParams = new URLSearchParams(window.location.search);
+    const id = urlParams.get('id');
+    
+    $(".btn-modifier").on("click", function() {
+          window.location.href = "bilan_seance_intervenant.html?id="+id;
+      });
+
+    $(document).ready(function () {
+      $.ajax({
+        url: './ActionServlet',
+        type: 'POST',
+        dataType: 'json',
+        data: {
+          todo: 'obtenir-details-soutien',
+          idSoutien: id
+        }
+      }).done(function (data) {
+          const infos = data.infosSoutien[0];
+        $('#matiere').text(infos.matiere);
+        $('#intervenant').text(infos.intervenant);
+        $('#eleve').text(infos.eleve);
+        $('#date').text(infos.dateDebut);
+        $('#description').val(infos.description);
+        $('#visio').attr('href', infos.lien).text(infos.lien);
+        $('#niveau').text(infos.niveauComprehension);
+        $('#bilan').val(infos.bilan);
+      });
+    });
+  </script>
+</body>
+</html>

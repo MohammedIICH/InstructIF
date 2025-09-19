@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Connexion Élève - Instruct'IF</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        body {
+            background-color: #e3f7cc;
+            font-family: sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .container {
+            background-color: #ccc;
+            border-radius: 15px;
+            padding: 2rem;
+            width: 350px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.15);
+        }
+
+        .tabs {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 1rem;
+        }
+
+        .tabs button {
+            background: none;
+            border: none;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .tabs button.active {
+            background-color: #92df7d;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+        }
+
+        label {
+            display: block;
+            margin-top: 1rem;
+        }
+
+        input {
+            width: 100%;
+            padding: 0.5rem;
+            border-radius: 6px;
+            border: 1px solid #aaa;
+            margin-top: 0.3rem;
+        }
+
+        .actions {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 1rem;
+        }
+
+        .actions a {
+            font-size: 0.9rem;
+            color: blue;
+            text-decoration: underline;
+            cursor: pointer;
+        }
+
+        button.connecter {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 0.6rem 1.5rem;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .error {
+            margin-top: 1rem;
+            color: red;
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="tabs">
+            <button class="active">Élève</button>
+            <button onclick="window.location.href='connexion_intervenant.html'">Intervenant</button>
+        </div>
+
+        <form id="loginForm">
+            <label for="email">Identifiant :</label>
+            <input type="email" id="email" required>
+
+            <label for="password">mot de passe :</label>
+            <input type="password" id="password" required>
+
+            <div class="actions">
+                <a href="inscription.html">S’inscrire</a>
+                <button class="connecter">Connecter</button>
+            </div>
+        </form>
+
+        <div class="error" id="errorMsg"></div>
+    </div>
+
+   <script>
+    $(document).ready(function () {
+        $('.connecter').on('click', function (e) {
+            e.preventDefault(); // Empêche le formulaire de recharger la page
+
+            $('#Msg').text('');
+            $('#errorMsg').text('');
+
+            const mail = $('#email').val();
+            const password = $('#password').val();
+
+            $.ajax({
+                url: './ActionServlet',
+                type: 'POST',
+                dataType: 'json',
+                data: {
+                    todo: "authentifier-eleve",
+                    mail: mail,
+                    password: password
+                }
+            })
+            .done(function (response) {
+                if (response.auth && response.auth[0].isAuth === true) {
+                    console.log("done done");
+                    $('#Msg').text("Connexion réussie !");
+                    window.location.href = 'profil_eleve.html';
+                } else {
+                    $('#errorMsg').text("Identifiants invalides.");
+                    console.log("done fail");
+                }
+            })
+            .fail(function () {
+                console.log("fail");
+                $('#errorMsg').text("Identifiants invalides.");
+            });
+        });
+    });
+</script>
+
+</body>
+
+</html>

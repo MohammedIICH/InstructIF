@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <title>Instruct'IF – Détails du soutien eleve</title>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <style>
+    /* style_detailsSoutien.css */
+    body {
+      background: #e1faaf;
+      font-family: sans-serif;
+    }
+
+    .badge {
+            position: absolute;
+            top: -1.8rem;
+            left: 1rem;
+            background: #8cd34c;
+            color: #000;
+            font-weight: bold;
+            padding: 0.3rem 1rem;
+            border-radius: 9999px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+    .profil {
+      position: absolute;
+      top: -5rem;
+      left: 1rem;
+      background: #038c1d;
+      color: #000;
+      font-weight: bold;
+      padding: 0.3rem 1rem;
+      border-radius: 9999px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+
+    /* --- Form groups --- */
+    .form-group {
+      display: flex;
+      align-items: center;
+      margin: 1.5rem 0;
+    }
+    .form-group label {
+      flex: 0 0 8rem;
+      font-weight: bold;
+    }
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+      flex: 1;
+      padding: 0.5rem;
+      border: 1px solid #aaa;
+      border-radius: 0.3rem;
+      font-size: 1rem;
+    }
+
+    .container {
+      position: relative;
+      max-width: 600px;
+      margin: 2rem auto;
+      background: #d7d7d7;
+      padding: 2rem;
+      border-radius: 1rem;
+      margin-top: 1rem;
+    }
+
+    .details-table {
+      width: 100%;
+      border-spacing: 1.5rem 0.5rem;
+      margin-bottom: 2rem;
+    }
+    .details-table th {
+      text-align: right;
+      padding-right: 0.5rem;
+      font-weight: bold;
+    }
+    .details-table td {
+      text-align: left;
+    }
+
+    .actions {
+      text-align: center;
+      margin-top: 2rem;
+    }
+
+    #valider {
+      padding: 0.5rem 1.5rem;
+      background: #8cd34c;
+      color: #000;
+      border: none;
+      border-radius: 0.3rem;
+      cursor: pointer;
+      font-size: 1rem;
+    }
+    #valider:hover {
+      background: #45a045;
+    }
+  </style>
+</head>
+<body>
+
+  <h1 style="text-align:center; color:#323433;">
+    Instruct'IF
+  </h1>
+
+  <br>  <br>  <br>  <br>
+
+
+        
+  <div class="container">
+    
+    <div class="profil">
+      <a href="profil_eleve.html" style="color: #000;">Profil</a>
+    </div>
+
+    <div class="badge">Détails du soutien </div>
+
+    <table class="details-table">
+      <tr>
+        <th>Matière:</th><td id="matiere"></td>
+        <th>Intervenant:</th><td id="intervenant"></td>
+      </tr>
+      <tr>
+        <th>Élève:</th><td id="eleve"></td>
+        <th>Date:</th><td id="date"></td>
+      </tr>
+    </table>
+
+    <div class="form-group">
+      <label for="desc-demande">Description demande:</label>
+      <textarea id="desc-demande" readonly rows="5"></textarea>
+    </div>
+
+    <p>
+      <strong>Lien de la visio-conférence:</strong><br>
+      <a id="lien-visio" href="#" target="_blank"></a>
+    </p>
+
+    <p>
+      <strong>Niveau de compréhension de l’élève:</strong>
+      <span id="niveau"></span> / 5
+    </p>
+
+    <div class="form-group">
+      <label for="bilan">Bilan de l’intervenant:</label>
+      <textarea id="bilan" readonly rows="4"></textarea>
+    </div>
+
+    <div class="actions">
+      <button id="valider" class="link">Noter la séance</button>
+    </div>
+  </div>
+
+  <script>
+    // DetailsSoutien.js
+    $(document).ready(function() {
+      // 1) Recupera o parâmetro id da URL
+      const params = new URLSearchParams(window.location.search);
+      const supportId = params.get('id');  // ex: ...details.html?id=123
+      $("#valider").on("click", function() {
+          window.location.href = "eval_comprehension_eleve.html?id="+supportId;
+      });
+
+      // 2) Requisição AJAX para buscar detalhes
+      $.ajax({
+        url: './ActionServlet',
+        method: 'GET',
+        data: {
+          todo: 'obtenir-details-soutien',
+          idSoutien: supportId
+        },
+        dataType: 'json'
+      })
+      .done(function(detail) {
+        // 3) Preenche os elementos com os dados recebidos
+        $('#matiere').text(detail.infosSoutien[0].matiere);
+        $('#intervenant').text(detail.infosSoutien[0].intervenant);
+        $('#eleve').text(detail.infosSoutien[0].eleve);
+        $('#date').text(detail.infosSoutien[0].dateDebut);
+
+        $('#desc-demande').text(detail.infosSoutien[0].description);
+
+        $('#lien-visio')
+          .attr('href', detail.infosSoutien[0].lien)
+          .text(detail.infosSoutien[0].lien);
+
+        $('#niveau').text(detail.infosSoutien[0].niveauComprehension);
+
+        $('#bilan').text(detail.infosSoutien[0].bilan);
+      })
+      .fail(function(jqXHR, textStatus, errorThrown) {
+        console.error('Erro ao carregar detalhes do soutien:', textStatus, errorThrown);
+        alert('Não foi possível carregar os detalhes. Tente novamente mais tarde.');
+      });
+    });
+  </script>
+
+</body>
+</html>

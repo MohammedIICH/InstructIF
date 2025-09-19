@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <title>Instruct'IF – Connexion</title>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <style>
+    
+    body {
+      background: #e1faaf;
+      font-family: sans-serif;
+    }
+
+    .badge {
+      position: absolute;
+      top: 9rem;
+      left: 28rem;
+      background: #8cd34c;
+      color: #000;
+      font-weight: bold;
+      padding: 0.3rem 1rem;
+      border-radius: 9999px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+
+    .profil {
+      position: absolute;
+      top: 6rem;
+      left: 28rem;
+      background: #038c1d;
+      color: #000;
+      font-weight: bold;
+      padding: 0.3rem 1rem;
+      border-radius: 9999px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+
+    /* --- Form groups --- */
+    .form-group {
+      display: flex;
+      align-items: center;
+      margin-bottom: 1.5rem;
+    }
+
+    .form-group label {
+      flex: 0 5rem 8rem;
+      font-weight: bold;
+    }
+
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+      flex: 1;
+      padding: 0.5rem;
+      border: 1px solid #aaa;
+      border-radius: 0.3rem;
+      font-size: 1rem;
+    }
+
+    .demande-container {
+      max-width: 600px;
+      margin: 2rem auto;
+      background: #d7d7d7;
+      padding: 2rem;
+      border-radius: 1rem;
+    }
+
+    .actions {
+      text-align: center;
+      margin-top: 2rem;
+    }
+
+    #valider {
+      padding: 0.5rem 1.5rem;
+      background: #8cd34c;
+      color: rgb(0, 0, 0);
+      border: none;
+      border-radius: 0.3rem;
+      cursor: pointer;
+      font-size: 1rem;
+      justify-content: center;
+      align-items: center;
+    }
+
+    #valider:hover {
+      background: #45a045;
+    }
+
+    #profil {
+      padding: 0.2rem 1.5rem;
+      background: #038c1d;
+      color: rgb(0, 0, 0);
+      border: none;
+      border-radius: 0.3rem;
+      cursor: pointer;
+      font-size: 1rem;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .decription-group {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start; 
+        margin-bottom: 1.5rem;   
+        }
+
+        .decription-group label {
+        margin-bottom: 0.5rem;   
+        flex: none;              
+        }
+
+        .decription-group textarea {
+        flex: none;              
+        width: 100%;             
+    }
+  </style>
+</head>
+<body>
+
+  <h1 style="text-align:center; color:#323433;">
+    Instruct'IF
+  </h1>
+
+  <br>
+
+  <h3>
+    <div class="profil">
+      <button id="profil" class="link">Profil</button>
+    </div>
+  </h3>
+
+  <h3>
+    <div class="badge">
+      Demande
+    </div>
+  </h3>
+
+  <br>
+
+  <div class="demande-container">
+    <form id="demande">
+      <div class="form-group">
+        <label>Matière:</label>
+        <select id="matiere" name="matiere" required>
+          <option value="" disabled selected>Choisir une matière</option>
+          <option value="Mathématiques">Mathématiques</option>
+          <option value="Physique">Physique</option>
+          <option value="Chimie">Chimie</option>
+          <option value="Histoire">Histoire</option>
+          <option value="Géographie">Géographie</option>
+          <option value="Français">Français</option>
+          <option value="Anglais">Anglais</option>
+          <option value="Espagnol">Espagnol</option>
+          <option value="Allemand">Allemand</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>Heure:
+          <input id="heure" type="time" name="heure" required />
+        </label>
+      </div>
+
+      <div class="form-group decription-group">
+        <label>Description:</label>
+        <textarea id="description" name="description" rows="6" required></textarea>
+      </div>
+
+      <div class="actions">
+        <button id="valider" class="link">Valider</button>
+      </div>
+    </form>
+  </div>
+
+  <script>
+    
+    $(document).ready(function() {
+      
+      $('#valider').on('click', function(e) {
+        e.preventDefault(); 
+
+        
+        const payload = {
+          matiere: $('#matiere').val(),
+          heure: $('#heure').val(),
+          description: $('#description').val()
+        };
+
+        $.ajax({
+          url: './ActionServlet',           // Endpoint Java
+          type: 'POST',
+          data: {
+            todo: 'demande-soutien',
+            matiere: payload.matiere,
+            heureDebut: payload.heure,
+            description: payload.description
+          },
+          dataType: 'json'
+        })
+        .done(function (response) {
+          $('#Msg').text("Identifiants valides.");
+        })
+        .fail(function () {
+          $('#errorMsg').text("Identifiants invalides.");
+        });
+      });
+    });
+  </script>
+
+</body>
+</html>

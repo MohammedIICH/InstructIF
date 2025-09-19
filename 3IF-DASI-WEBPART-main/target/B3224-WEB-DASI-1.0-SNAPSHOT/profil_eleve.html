@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Profil Élève - Instruct'IF</title>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <style>
+    body {
+      background-color: #e1faaf;
+      font-family: Arial, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      flex-direction: column;
+    }
+
+    .container {
+      position: relative;
+      background-color: #dcdcdc;
+      border-radius: 25px;
+      padding: 2rem;
+      width: 600px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.15);
+      margin-top: 1rem;
+    }
+
+    .badge {
+      position: absolute;
+      top: -1.8rem;
+      left: 1rem;
+      background: #8cd34c;
+      color: #000;
+      font-weight: bold;
+      padding: 0.3rem 1rem;
+      border-radius: 9999px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+
+    .nav {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 1rem;
+    }
+
+    .nav button {
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      padding: 0.5rem 1rem;
+      border-radius: 12px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .section {
+      background-color: #dcdcdc;
+      padding: 1.5rem;
+      border-radius: 12px;
+    }
+
+    .section h2 {
+      margin: 0 0 0.5rem 0;
+    }
+
+    .section p {
+      margin: 0 0 1rem 0;
+    }
+
+    .form-row {
+      display: flex;
+      margin: 0.5rem 0;
+      justify-content: space-between;
+    }
+
+    .form-row label {
+      width: 40%;
+    }
+
+    .form-row input {
+      width: 55%;
+      border: none;
+      padding: 0.3rem;
+      border-radius: 6px;
+      font-family: monospace;
+    }
+
+    .buttons {
+      margin-top: 1rem;
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+    }
+
+    .buttons button {
+      padding: 0.5rem 1rem;
+      border-radius: 12px;
+      font-weight: bold;
+      border: none;
+      cursor: pointer;
+    }
+
+    .modifier {
+      background-color: #4CAF50;
+      color: white;
+    }
+
+    .enregistrer {
+      background-color: #555;
+      color: white;
+    }
+
+    .deconnexion {
+      background-color: #e53935;
+      color: white;
+    }
+  </style>
+</head>
+<body>
+
+  <h1 style="text-align:center; color:#323433;">
+    Instruct'IF
+  </h1>
+
+  <br>
+
+  <div class="container">
+    <div class="badge">Profile</div>
+    <div class="nav">
+      <button onclick="window.location.href='historique_eleve.html'">Historique</button>
+      <button onclick="window.location.href='page_demande_eleve.html'">Demande</button>
+      <button class="deconnexion" id="btnDeconnexion">Déconnexion</button>
+    </div>
+
+    <div class="section">
+      <h2><span id="nomComplet">Nom Prénom</span></h2>
+      <p>élève</p>
+
+      <div class="form-row"><label>Date de naissance:</label><input type="text" id="naissance" disabled></div>
+      <div class="form-row"><label>Code d'établissement:</label><input type="text" id="codeEtab" disabled></div>
+      <div class="form-row"><label>Classe:</label><input type="text" id="classe" disabled></div>
+      <div class="form-row"><label>Mail:</label><input type="text" id="mail" disabled></div>
+      <div class="form-row"><label>Nom de l'établissement:</label><input type="text" id="nomEtab" disabled></div>
+      <div class="form-row"><label>Nom:</label><input type="text" id="nom" disabled></div>
+      <div class="form-row"><label>Prénom:</label><input type="text" id="prenom" disabled></div>
+
+      <div class="buttons">
+        <button class="modifier" id="modifierBtn">Modifier</button>
+        <button class="enregistrer" id="enregistrerBtn" disabled>Enregistrer</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    $(document).ready(function () {
+      $.ajax({
+        url: './ActionServlet',
+        type: 'GET',
+        dataType: 'json',
+        data: { todo: 'demande-profil-eleve' }
+      }).done(function (data) {
+        const info = data.infosEleve[0];
+        $('#id').val(info.id);
+        $('#naissance').val(info.datenaissance);
+        $('#codeEtab').val(info.codeEtablissement);
+        $('#classe').val(info.classe);
+        $('#mail').val(info.mail);
+        $('#nomEtab').val(info.nomEtablissement);
+        $('#nom').val(info.nom);
+        $('#prenom').val(info.prenom);
+        $('#nomComplet').text(info.nom + ' ' + info.prenom);
+      });
+
+      $('#modifierBtn').click(function () {
+        $('#naissance, #codeEtab, #classe, #mail, #nom, #prenom').prop('disabled', false);
+        $('#enregistrerBtn').prop('disabled', false);
+      });
+
+      $('#enregistrerBtn').click(function () {
+        $.ajax({
+          url: './ActionServlet',
+          type: 'POST',
+          data: {
+            todo: 'updateProfilEleve',
+            naissance: $('#naissance').val(),
+            codeEtab: $('#codeEtab').val(),
+            classe: $('#classe').val(),
+            mail: $('#mail').val(),
+            nom: $('#nom').val(),
+            prenom: $('#prenom').val()
+          }
+        }).done(function () {
+          alert("Informations mises à jour !");
+          $('#naissance, #codeEtab, #classe, #mail, #nom, #prenom').prop('disabled', true);
+          $('#enregistrerBtn').prop('disabled', true);
+        }).fail(function () {
+          alert("Erreur lors de l'enregistrement");
+        });
+      });
+
+      $('#btnDeconnexion').click(function () {
+        $.ajax({
+          url: './ActionServlet',
+          type: 'POST',
+          dataType: 'json',
+          data: { todo: 'deconnexion' }
+        }).done(function (response) {
+            console.log(response);
+          if (response.success && response.success.success === true) {
+            window.location.href = 'connexion.html';
+          } else {
+            alert("Échec de la déconnexion.");
+          }
+        }).fail(function () {
+          alert("Erreur serveur lors de la déconnexion.");
+        });
+      });
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Profil Élève - Séance - Instruct'IF</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        body {
+            background-color: #e3f7cc;
+            font-family: monospace;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .container {
+            background-color: #dcdcdc;
+            padding: 2rem;
+            border-radius: 25px;
+            width: 600px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.15);
+        }
+
+        .nav {
+            display: flex;
+            justify-content: flex-start;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .nav button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 12px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .title {
+            background-color: #92df7d;
+            border-radius: 12px;
+            padding: 0.4rem 1rem;
+            margin-bottom: 1rem;
+            font-weight: bold;
+            text-align: center;
+        }
+
+        .profile-block {
+            background-color: #b3a6a6;
+            padding: 1.5rem;
+            border-radius: 12px;
+        }
+
+        .profile-block p {
+            margin: 0.6rem 0;
+        }
+
+        .profile-block input {
+            width: 100%;
+            padding: 0.4rem;
+            border-radius: 6px;
+            border: none;
+            font-family: monospace;
+            background-color: #f5f5f5;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="nav">
+            <button onclick="window.location.href='historique_eleve.html'">Historique</button>
+            <button onclick="window.location.href='details_soutien_intervenant.html'">Détail soutien</button>
+        </div>
+
+        <div class="title" id="enteteProfil">Profil élève de la séance</div>
+
+        <div class="profile-block">
+            <h3><span id="nomComplet">Nom Prénom</span></h3>
+            <p><strong>élève</strong></p>
+            <p><strong>Mail:</strong> <input type="text" id="mail" readonly></p>
+            <p><strong>Code d'établissement:</strong> <input type="text" id="codeEtab" readonly></p>
+            <p><strong>Classe:</strong> <input type="text" id="classe" readonly></p>
+            <p><strong>Établissement:</strong> <input type="text" id="etablissement" readonly></p>
+            <p><strong>Nom:</strong> <input type="text" id="nom" readonly></p>
+            <p><strong>Prénom:</strong> <input type="text" id="prenom" readonly></p>
+        </div>
+    </div>
+
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        const id = urlParams.get('id');
+
+        $(document).ready(function () {
+            $.ajax({
+                url: './ActionServlet',
+                type: 'POST',
+                dataType: 'json',
+                data: { todo: 'demande-profil-eleve', mailEleve: "A CHANGER" }
+            }).done(function (data) {
+                $('#mail').val(data.mail);
+                $('#codeEtab').val(data.codeEtab);
+                $('#classe').val(data.classe);
+                $('#etablissement').val(data.nomEtab);
+                $('#nom').val(data.nom);
+                $('#prenom').val(data.prenom);
+                $('#nomComplet').text(data.nom + ' ' + data.prenom);
+                $('#enteteProfil').text("Profil élève de la séance du " + data.dateSeance);
+            });
+        });
+    </script>
+</body>
+
+</html>

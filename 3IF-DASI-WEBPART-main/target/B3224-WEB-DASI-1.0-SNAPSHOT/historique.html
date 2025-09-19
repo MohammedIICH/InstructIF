@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Historique - Instruct'IF</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        body {
+            background-color: #e3f7cc;
+            font-family: monospace;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .container {
+            background-color: #dcdcdc;
+            padding: 2rem;
+            border-radius: 25px;
+            width: 90%;
+            max-width: 900px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.15);
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+        }
+
+        .header button {
+            background-color: #92df7d;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 15px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        h2 {
+            text-align: center;
+            margin-bottom: 1rem;
+        }
+
+        .table-container {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background-color: #eee;
+            border-radius: 12px;
+        }
+
+        th,
+        td {
+            padding: 0.6rem;
+            text-align: center;
+            border-bottom: 1px solid #ccc;
+        }
+
+        th {
+            background-color: #c0c0c0;
+        }
+
+        .btn-detail {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 0.3rem 0.7rem;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        select {
+            padding: 0.3rem;
+            border-radius: 6px;
+            font-family: monospace;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <button onclick="window.location.href='profil.html'">Page profil</button>
+            <button style="background-color: #4CAF50;">Historique</button>
+        </div>
+
+        <div class="top-bar">
+            <h2>Historique des soutiens</h2>
+            <label>Trier par :
+                <select id="sort">
+                    <option value="dateDebut">Date</option>
+                    <option value="intervenant">Intervenant</option>
+                    <option value="matiere">Matière</option>
+                </select>
+            </label>
+        </div>
+
+        <div class="table-container">
+            <table id="historiqueTable">
+                <thead>
+                    <tr>
+                        <th>N°</th>
+                        <th>Intervenant</th>
+                        <th>Matière</th>
+                        <th>Date de début</th>
+                        <th>Heure de début</th>
+                        <th>Accès détails</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Lignes insérées dynamiquement -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        let donneesSoutiens = [];
+
+        function afficherTable(data) {
+            const tbody = $('#historiqueTable tbody');
+            tbody.empty();
+            data.forEach((soutien, index) => {
+                tbody.append(`
+          <tr>
+            <td>#${index + 1}</td>
+            <td>${soutien.intervenant}</td>
+            <td>${soutien.matiere}</td>
+            <td>${soutien.date}</td>
+            <td>${soutien.heure}</td>
+            <td><button class="btn-detail" onclick="window.location.href='detailSoutien.html?id=${soutien.id}'">Détails</button></td>
+          </tr>
+        `);
+            });
+        }
+
+        $(document).ready(function () {
+            $.ajax({
+                url: './ActionServlet',
+                type: 'GET',
+                dataType: 'json',
+                data: { 
+                        todo: 'obtenir-historique-eleve',
+                        mailEleve: 'TESTWEB@mail.com',
+                        sortingType: $('#sort').val()
+                    }
+            })
+                .done(function (response) {
+                    if (response.soutiens) {
+                        donneesSoutiens = response.soutiens;
+                        afficherTable(donneesSoutiens);
+                    } else {
+                        $('#historiqueTable tbody').html('<tr><td colspan="6">Aucun soutien trouvé.</td></tr>');
+                    }
+                })
+                .fail(function () {
+                    alert("Erreur lors de la récupération de l'historique.");
+                });
+
+            $('#sort').on('change', function () {
+                trierPar(this.value);
+            });
+        });
+    </script>
+</body>
+
+</html>

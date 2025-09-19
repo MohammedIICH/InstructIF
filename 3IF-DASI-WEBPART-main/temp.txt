@@ -1,0 +1,17 @@
+{
+  "infosEleve": [
+    {
+      "id": 102,
+      "datenaissance": "Wed Nov 15 00:00:00 CET 13",
+      "codeEtablissement": "0010001W",
+      "classe": 0,
+      "mail": "testweb@mail.com",
+      "nomEtablissement": "LYCEE PROFESSIONNEL ALEXANDRE BERARD LYCEE DES METIERS DE L ENERGIE ET DE L HABITAT",
+      "nom": "Mathieu",
+      "prenom": "CARIAT"
+    }
+  ]
+}
+
+
+{"auth":[{"isBooked":true}]}

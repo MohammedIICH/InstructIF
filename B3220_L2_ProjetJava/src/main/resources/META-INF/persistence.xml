@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<persistence version="2.1" xmlns="http://xmlns.jcp.org/xml/ns/persistence" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/persistence http://xmlns.jcp.org/xml/ns/persistence/persistence_2_1.xsd">
+  <persistence-unit name="fr.insalyon.dasi.test_projetDASI_jar_1.0-SNAPSHOTPU" transaction-type="RESOURCE_LOCAL">
+    <provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>
+    <class>metier.modele.Eleve</class>
+    <class>metier.modele.Etablissement</class>
+    <class>metier.modele.Autre</class>
+    <class>metier.modele.Enseignant</class>
+    <class>metier.modele.Etudiant</class>
+    <class>metier.modele.Intervenant</class>
+    <class>metier.modele.Matiere</class>
+    <class>metier.modele.Soutien</class>
+    <properties>
+      <property name="javax.persistence.jdbc.url" value="jdbc:derby://localhost:1527/InstructIF"/>
+      <property name="javax.persistence.jdbc.user" value="B3220"/>
+      <property name="javax.persistence.jdbc.driver" value="org.apache.derby.jdbc.ClientDriver"/>
+      <property name="javax.persistence.jdbc.password" value="B3220"/>
+      <property name="javax.persistence.schema-generation.database.action" value="create"/>
+    </properties>
+  </persistence-unit>
+</persistence>

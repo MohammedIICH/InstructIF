@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Évaluation de compréhension - Instruct'IF</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        body {
+            background-color: #e1faaf;
+            font-family: sans-serif;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .container {
+            position: relative;
+            background-color: #d7d7d7;
+            padding: 2rem;
+            border-radius: 15px;
+            text-align: center;
+            width: 500px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            margin-top: 1rem;
+        }
+
+        h2 {
+            margin-bottom: 1rem;
+        }
+
+        .badge {
+            position: absolute;
+            top: -1.8rem;
+            left: 1rem;
+            background: #8cd34c;
+            color: #000;
+            font-weight: bold;
+            padding: 0.3rem 1rem;
+            border-radius: 9999px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+
+        .stars {
+            display: flex;
+            justify-content: center;
+            margin: 1rem 0;
+        }
+
+        .star {
+            font-size: 2.5rem;
+            color: #ccc;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+
+        .star.selected {
+            color: red;
+        }
+
+        .star.selected.level-1 {
+            color: red;
+        }
+
+        .star.selected.level-2 {
+            color: orange;
+        }
+
+        .star.selected.level-3 {
+            color: gold;
+        }
+
+        .star.selected.level-4 {
+            color: lightgreen;
+        }
+
+        .star.selected.level-5 {
+            color: green;
+        }
+
+        #valider {
+            margin-top: 1rem;
+            padding: 0.7rem 1.5rem;
+            background-color: #8cd34c;
+            color: #000;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        #message {
+            margin-top: 1rem;
+            font-weight: bold;
+            color: red;
+        }
+    </style>
+</head>
+
+
+
+<body>
+
+    <h1 style="text-align:center; color:#323433;">
+    Instruct'IF
+    </h1>
+
+    <br>
+
+
+    <div class="container">
+
+        <div class="badge">Evaluation</div>
+
+        <h2>Le cours de soutien est terminé !</h2>
+        <p>Saisissez votre niveau de compréhension du cours :</p>
+
+        <div class="stars">
+            <span class="star" data-value="1" title="Je n’ai rien compris">&#9733;</span>
+            <span class="star" data-value="2">&#9733;</span>
+            <span class="star" data-value="3">&#9733;</span>
+            <span class="star" data-value="4">&#9733;</span>
+            <span class="star" data-value="5" title="J’ai tout compris">&#9733;</span>
+        </div>
+
+        <button id="valider">Valider</button>
+        <div id="message"></div>
+    </div>
+
+    <script>
+        let selectedValue = 0;
+        const params = new URLSearchParams(window.location.search);
+        const supportId = params.get('id');
+
+        $('.star').on('click', function () {
+            selectedValue = parseInt($(this).data('value'));
+
+            $('.star').removeClass('selected level-1 level-2 level-3 level-4 level-5');
+
+            $('.star').each(function () {
+                if (parseInt($(this).data('value')) <= selectedValue) {
+                    $(this).addClass('selected level-' + selectedValue);
+                }
+            });
+        });
+
+        $('#valider').on('click', function () {
+            if (selectedValue === 0) {
+                $('#message').text("Veuillez sélectionner un niveau de compréhension.");
+                return;
+            }
+
+            $.ajax({
+                url: './ActionServlet',
+                type: 'POST',
+                data: {
+                    todo: 'evaluer-cours',
+                    rating: selectedValue,
+                    idSoutien: supportId
+                }
+            })
+                .done(function () {
+                    window.location.href = 'profil_eleve.html';
+                })
+                .fail(function () {
+                    $('#message').text("Erreur lors de l’envoi de l’évaluation.");
+                });
+        });
+    </script>
+</body>
+
+</html>

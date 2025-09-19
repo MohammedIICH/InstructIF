@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Connexion Élève - Instruct'IF</title>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <style>
+    body {
+      background-color: #e3f7cc;
+      font-family: monospace;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+    .container {
+      background-color: #dcdcdc;
+      padding: 2rem;
+      border-radius: 25px;
+      width: 500px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.15);
+      text-align: center;
+    }
+    .tabs {
+      display: flex;
+      justify-content: center;
+      gap: 2rem;
+      margin-bottom: 1.5rem;
+    }
+    .tabs button {
+      background: none;
+      border: none;
+      font-weight: bold;
+      cursor: pointer;
+      padding: 0.5rem 1rem;
+    }
+    .tabs .active {
+      background-color: #92df7d;
+      border-radius: 10px;
+    }
+    .form-group {
+      margin: 1rem 0;
+      text-align: left;
+    }
+    label {
+      display: block;
+      margin-bottom: 0.2rem;
+    }
+    input[type="password"] {
+      width: 100%;
+      padding: 0.5rem;
+      border-radius: 8px;
+      border: none;
+      font-family: monospace;
+    }
+    .btn-connecter {
+      margin-top: 1rem;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      padding: 0.6rem 1.5rem;
+      border-radius: 8px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    .error {
+      margin-top: 1rem;
+      color: red;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="tabs">
+      <button onclick="window.location.href='connexion.html'">Élève</button>
+      <button class="active">Intervenant</button>
+    </div>
+
+    <form id="formConnexion">
+      <div class="form-group">
+        <label for="identifiant">Identifiant :</label>
+        <input type="password" id="identifiant" required>
+      </div>
+      <button class="btn-connecter">Connecter</button>
+    </form>
+
+    <div class="error" id="errorMsg"></div>
+  </div>
+
+  <script>
+    $(document).ready(function () {
+      $('.btn-connecter').on('click', function (e) {
+        e.preventDefault();
+        const identifiant = $('#identifiant').val();
+
+        $.ajax({
+          url: './ActionServlet',
+          type: 'POST',
+          dataType: 'json',
+          data: {
+            todo: 'login-intervenant',
+            identifiant: identifiant
+          }
+        }).done(function (response) {
+          if (response.evalNonFaite === true) {
+            window.location.href = 'bilan_seance_intervenant.html';
+          } else {
+            window.location.href = 'profil_intervenant_intervenant.html';
+          }
+        }).fail(function () {
+          $('#errorMsg').text("Identifiant invalide ou erreur serveur.");
+        });
+      });
+    });
+  </script>
+</body>
+</html>

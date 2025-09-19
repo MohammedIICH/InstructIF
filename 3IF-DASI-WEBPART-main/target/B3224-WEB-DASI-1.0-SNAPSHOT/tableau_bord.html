@@ -1,0 +1,272 @@
+<!DOCTYPE HTML>
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>Demonstrat'IF - Graphiques HighCharts</title>
+
+        <style>
+
+            body {
+            background-color: #e1faaf;
+            font-family: sans-serif;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            }
+
+            .badge {
+            position: absolute;
+            top: -1.8rem;
+            left: 1rem;
+            background: #8cd34c;
+            color: #000;
+            font-weight: bold;
+            padding: 0.3rem 1rem;
+            border-radius: 9999px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    
+            }
+
+            .container {
+            position: relative;
+            background-color: #dcdcdc;
+            padding: 2rem;
+            border-radius: 25px;
+            width: 90%;
+            max-width: 900px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.15);
+            margin-top: 1rem;
+            }
+
+            .charts-wrapper {
+            display: flex;
+            gap: 1rem;              
+            align-items: flex-start;
+            }
+
+            .highcharts-container {
+            flex: 1;                
+            min-width: 300px;      
+            height: 400px;          
+            }
+
+            .top-bar {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                width: 90%;
+                max-width: 900px;
+                margin: 1rem auto;
+                padding: 0.5rem 1rem;
+                background: #dcdcdc;
+                border-radius: 1.5rem;
+                box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            }
+
+            .btn-profile {
+                text-decoration: none;
+                background: #4CAF50;
+                color: #fff;
+                padding: 0.4rem 1rem;
+                border-radius: 0.5rem;
+                font-weight: bold;
+            }
+            .btn-profile:hover {
+                background: #3a8e3a;
+            }
+
+             #map {
+            flex: 1;
+            width: 100%;
+            }
+        </style>
+        <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+    </head>
+    <body>
+        <h1>Instruct'IF</h1>
+        <br>
+        <div class="container">
+            <div class="top-bar">
+                <span class="badge">Tableau de bord</span>
+                <a href="profil_intervenant_intervenant.html" class="btn-profile">Page profil</a>
+            </div>
+
+            <div class="charts-wrapper">
+                <div id="container-3" class="highcharts-container"></div>
+                <div id="container-5" class="highcharts-container"></div>
+            </div>
+
+            <p>Repartition geographique des cours:</p>       
+            <div id="map" style="height: 600px; width: 80%; margin: auto;"></div>     
+        </div>
+        
+
+
+        <script src="https://code.highcharts.com/highcharts.js"></script>
+        <script type="text/javascript">
+
+            $(document).ready(function(){
+
+                // 1) Bar chart: expect { labels: […], data: […] }
+                $.ajax({
+                    url: './ActionServlet',
+                    method: 'GET',
+                    dataType: 'json',
+                    data: { todo: 'obtenir-statistiques' }
+                })
+                .done(function(graphData) {
+                    buildBarChart('container-3', graphData);
+                    buildPieChart('container-5', graphData)
+                })
+                .fail(function(err) {
+                    console.error('Erro ao carregar dados do bar chart:', err);
+                });
+            });
+
+            function buildBarChart(container, graphData) {
+
+                Highcharts.chart(container, {
+
+                    chart: {
+                        type: 'column'
+                    },
+                    title: {
+                        text: 'Répartition horaire des cours'
+                    },
+                    subtitle: {
+                        text: 'Source: a priori'
+                    },
+                    xAxis: {
+                        categories: graphData.labels
+                    },
+                    yAxis: {
+                        title: {
+                            text: 'Heure'
+                        }
+                    },
+                    legend: {
+                        enabled: false
+                    },
+                    credits: {
+                        enabled: false
+                    },
+                    series: [{name: 'Données', data: graphData.data}]
+                });
+            }
+
+            function buildPieChart(container, graphData) {
+
+                Highcharts.chart(container, {
+
+                    chart: {
+                        type: 'pie'
+                    },
+                    title: {
+                        text: 'Répartition des classes'
+                    },
+                    subtitle: {
+                        text: 'Temps de Parole (min) - Source: a priori'
+                    },
+                    credits: {
+                        enabled: false
+                    },
+                    series: [{name: graphData.label, data: graphData.data}]
+                });
+            }
+
+            //MAP CODE
+            var googleMapInstance = null;
+
+            function makeInfoWindow(title) {
+                return new google.maps.InfoWindow({
+                    content: '<div>Information: ' + title + '</div>'
+                });
+            }
+
+            function attachInfoWindow(marker, infowindow, htmlDescription) {
+                marker.addListener('click', function () {
+
+                    infowindow.setContent(htmlDescription);
+                    infowindow.open(googleMapInstance, this);
+                });
+            }
+
+            function initMap() {
+
+                googleMapInstance = new google.maps.Map(document.getElementById('map'), {
+                    center: {lat: 45.7601424, lng: 4.8961779},
+                    zoom: 13
+                });
+
+                var infowindow = makeInfoWindow('');
+
+                var marker = new google.maps.Marker({
+                    map: googleMapInstance,
+                    position: {lat: 45.782122, lng: 4.872735},
+                    title: "Département IF, INSA de Lyon",
+                    icon: {url: './image/bird.png', scaledSize: new google.maps.Size(32, 32)}
+                });
+
+                marker.addListener('click', function () {
+
+                    infowindow.setContent('<div>Information: ' + marker.title + '</div>');
+                    infowindow.open(googleMapInstance, marker);
+                });
+
+                var marker2 = new google.maps.Marker({
+                    map: googleMapInstance,
+                    position: {lat: 45.782592, lng: 4.878238},
+                    title: "Entrée principale, INSA de Lyon",
+                    icon: {url: './image/snake.png', scaledSize: new google.maps.Size(32, 32)}
+                });
+
+                marker2.addListener('click', function () {
+
+                    infowindow.setContent('<div>Information: ' + marker2.title + '</div>');
+                    infowindow.open(googleMapInstance, marker2);
+                });
+
+                // Simuler un appel AJAX (attente 5s)
+                setTimeout(
+                        generateMarkers,
+                        5000
+                        );
+            }
+
+            function generateMarkers() {
+
+                // Petite popup Google Maps
+                var infowindow = makeInfoWindow('');
+
+                var position = {lat: 45.782122, lng: 4.872735};
+
+                for (var i = 0; i < 100; i++) {
+
+                    var iconImage = null; // marker par défaut
+                    if (i % 2 === 0) {
+                        // image pour marker personnalisé
+                        iconImage = {url: './image/UnderConstruction.png', scaledSize: new google.maps.Size(32, 32)}
+                    }
+
+                    var marker = new google.maps.Marker({
+                        map: googleMapInstance,
+                        position: {lat: position.lat + (Math.random() - 0.5) / 10.0, lng: position.lng + 2 * (Math.random() - 0.5) / 10.0},
+                        title: 'Endroit #' + i,
+                        icon: iconImage
+                    });
+
+                    attachInfoWindow(
+                            marker, infowindow,
+                            '<div><strong><a href="./endroit.html?' + i + '">Endroit #' + i + '</a></strong><br/>Ceci est l\'endroit charmant numéro ' + i + '<br/>' + 'Incroyable !' + '</div>'
+                            );
+                }
+
+            }
+
+        </script>
+        <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAhf3JleYpal9S-xouJYH8lf7Dvz5Y2Nko&callback=initMap">
+        </script>
+    </body>
+</html>
